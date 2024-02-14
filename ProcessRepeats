@@ -5600,7 +5600,7 @@ sub generateOutput {
     my $db = FastaDB->new(
                            fileName    => $options{'maskSource'},
                            openMode    => SeqDBI::ReadOnly,
-                           maxIDLength => 50
+                           maxIDLength => 70
     );
     my $maskFormat = '';
     $maskFormat = 'x'      if ( $options{'x'} );

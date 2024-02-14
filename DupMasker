@@ -361,7 +361,7 @@ die "\nFile does not exist $fastaFile!!!\n\n" if ( !-s $fastaFile );
 my $libDB = FastaDB->new(
                           fileName    => $dupliconLib,
                           openMode    => SeqDBI::ReadOnly,
-                          maxIDLength => 50
+                          maxIDLength => 70
 );
 
 ##
@@ -370,7 +370,7 @@ my $libDB = FastaDB->new(
 my $db = FastaDB->new(
                        fileName    => $fastaFile,
                        openMode    => SeqDBI::ReadOnly,
-                       maxIDLength => 50
+                       maxIDLength => 70
 );
 if ( $options{'forceSearch'} || !-e "$fastaFile.out" )
 {

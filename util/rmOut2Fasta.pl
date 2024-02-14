@@ -141,7 +141,7 @@ if ( !( $options{'fasta'} && $options{'out'} ) ) {
 my $db = FastaDB->new(
                        fileName    => $options{'fasta'},
                        openMode    => SeqDBI::ReadOnly,
-                       maxIDLength => 50
+                       maxIDLength => 70
 );
 
 my $resultCollection =

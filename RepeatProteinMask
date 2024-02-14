@@ -255,7 +255,7 @@ if ( exists $options{'nolowsimple'} )
 my $seqDB = FastaDB->new(
                           fileName    => $fastaFile,
                           openMode    => SeqDBI::ReadOnly,
-                          maxIDLength => 50
+                          maxIDLength => 70
 );
 
 if ( $seqDB->getSeqCount() <= 0 )

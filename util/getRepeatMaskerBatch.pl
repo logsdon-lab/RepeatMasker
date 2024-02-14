@@ -242,7 +242,7 @@ foreach my $file ( @ARGV ) {
   my $db = FastaDB->new(
                          fileName    => $file,
                          openMode    => SeqDBI::ReadWrite,
-                         maxIDLength => 50
+                         maxIDLength => 70
   );
   my $batcher = SimpleBatcher->new( $db, $fragmentSize, $overlapLen );
 

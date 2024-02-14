@@ -511,7 +511,7 @@ sub maskSequence
   my $seqDB = FastaDB->new(
                             fileName    => $inputFile,
                             openMode    => SeqDBI::ReadOnly,
-                            maxIDLength => 50
+                            maxIDLength => 70
   );
 
   my @seqIDs     = $seqDB->getIDs();
