@@ -281,7 +281,7 @@ sub getParameters {
   my $engine = $this->getPathToEngine();
   if ( !defined $engine || !-f "$engine" ) {
     croak $CLASS
-        . "::search: The path to the search engine is undefined or\n"
+        . "::getParameters: The path to the search engine is undefined or\n"
         . "is set incorrectly: $engine\n";
   }
 
@@ -333,7 +333,7 @@ sub getParameters {
       $parameters .= " -matrix $value";
     }
     else {
-      croak $CLASS. "::search: Error...matrix ($value) does not exist!\n";
+      croak $CLASS. "::getParameters: Error...matrix ($value) does not exist!\n";
     }
   }
   if ( ( $value = $this->getQuery() ) ) {
@@ -341,22 +341,22 @@ sub getParameters {
       $parameters .= " $value";
     }
     else {
-      croak $CLASS. "::search: Error...query ($value) does not exist!\n";
+      croak $CLASS. "::getParameters: Error...query ($value) does not exist!\n";
     }
   }
   else {
-    croak $CLASS. "::search: Error query undefined!\n";
+    croak $CLASS. "::getParameters: Error query undefined!\n";
   }
   if ( ( $value = $this->getSubject() ) ) {
     if ( -f $value ) {
       $parameters .= " $value";
     }
     else {
-      croak $CLASS. "::search: Error...subject ($value) does not exist!\n";
+      croak $CLASS. "::getParameters: Error...subject ($value) does not exist!\n";
     }
   }
   else {
-    croak $CLASS. "::search: Error subject undefined!\n";
+    croak $CLASS. "::getParameters: Error subject undefined!\n";
   }
 
   return ( "$engine $parameters" );
@@ -451,8 +451,13 @@ sub search {
   if ( $this->getDEBUG() ) {
     ## Create a debug file
     my $outFile;
+    my $rand = 0;
+    my $currentTime;
     do {
-      $outFile = $outputDirName . "/cmResults-" . time() . ".out";
+      $currentTime = time();
+      $rand = rand(5000);
+      $outFile     = $outputDirName . "/cmResults-$currentTime-$$-$rand.out";
+
     } while ( -f $outFile );
     open OUT, ">$outFile";
     while ( <$POUTPUT> ) {
@@ -550,7 +555,7 @@ sub parseOutput {
   my $CMFILE;
   if ( ref( $nameValueParams{'searchOutput'} ) !~ /GLOB|FileHandle|IO::File/ ) {
     open $CMFILE, $nameValueParams{'searchOutput'}
-        or die $CLASS
+        or croak $CLASS
         . "::parseOutput: Unable to open "
         . "results file: $nameValueParams{'searchOutput'} : $!";
   }
@@ -600,6 +605,8 @@ sub parseOutput {
   my $transI;
   my $transV;
   my $kimura;
+  my $cpgSites;
+  my $kimuraRaw;
   my $subjSeq;
   my $result;
   my $alignPos          = 0;
@@ -645,10 +652,17 @@ sub parseOutput {
       $matrix =~ s/[\n\r]//g;
     }
 
-    # Kimura Divergence
+    # Kimura Divergence (adjusted)
     #  - Non crossmatch field
     if ( /^Kimura.*=\s*(\S+)/ ) {
       $kimura = $1;
+    }
+
+    # Kimura unadjusted and cpg sites
+    #  -Non crossmatch field
+    if ( /^CpG sites\s*=\s*(\d+),\s*Kimura \(unadjusted\)\s*=\s*([\d\.]+)/ ) {
+      $cpgSites = $1;
+      $kimuraRaw = $2;
     }
 
     #
@@ -834,6 +848,12 @@ sub parseOutput {
       if ( defined $kimura ) {
         $result->setPctKimuraDiverge( $kimura );
       }
+      if ( defined $kimuraRaw ) {
+        $result->setPctRawKimuraDiverge($kimuraRaw);
+      }
+      if ( defined $cpgSites ) {
+        $result->setCpGSites($cpgSites);
+      }
 
       if ( defined $callbackFunc ) {
         $callbackFunc->( $result );
@@ -846,6 +866,8 @@ sub parseOutput {
       $transV            = 0;
       $transI            = 0;
       $kimura            = undef;
+      $kimuraRaw         = undef;
+      $cpgSites          = undef;
       $alignPos          = 0;
       $queryComplemented = 0;
       @hdrLineArray      = ();

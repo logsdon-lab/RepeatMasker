@@ -291,9 +291,9 @@ sub setPathToEngine {
 
 =head2 getParameters()
 
-  Use: my  $wuBlastParamString  = getParameters( );
+  Use: my  $nhmmerParamString  = getParameters( );
 
-  Convert object parameters into WUBlast command line parameters.
+  Convert object parameters into nhmmer command line parameters.
 
 =cut
 
@@ -309,10 +309,9 @@ sub getParameters {
         . "is set incorrectly: $engine\n";
   }
 
-  # TESTING: Setting BG
-  #
   my $bgFile = undef;
   if ( 0 ) {
+    # Testing setting BG 
     my $value;
     if ( $value = $this->getMatrix() ) {
       if ( $value =~ /(\d\d)g/ ) {
@@ -340,7 +339,6 @@ sub getParameters {
         close BGFILE;
       }
     }
-
     # END Testing
   }
 
@@ -544,9 +542,9 @@ sub search {
     if ( defined( $maskLevel = $this->getMaskLevel() ) && $maskLevel < 101 ) {
       my $strand;
       print "Using: masklevel = $maskLevel\n" if ( $this->getDEBUG() );
-      print ""
-          . $searchResultsCollection->toString( SearchResult::OutFileFormat )
-          . "\n";
+      #print ""
+      #    . $searchResultsCollection->toString( SearchResult::OutFileFormat )
+      #    . "\n";
       if ( defined( $strand = $this->getMaskLevelSequence() ) ) {
         $searchResultsCollection->maskLevelFilter( value  => $maskLevel,
                                                    strand => $strand );
@@ -560,9 +558,9 @@ sub search {
           . " hits "
           . "after masklevel filtering\n"
           if ( $this->getDEBUG() );
-      print ""
-          . $searchResultsCollection->toString( SearchResult::OutFileFormat )
-          . "\n";
+      #print ""
+      #    . $searchResultsCollection->toString( SearchResult::OutFileFormat )
+      #    . "\n";
     }
 
     for ( my $i = 0 ; $i < $searchResultsCollection->size() ; $i++ ) {
@@ -861,6 +859,9 @@ sub parseOutput {
     if ( $inAlignState
          && /^\s+(\S+)\s+(\d+|-)\s+([acgtnbdhvrykmsw\.\-]+)\s+(\d+|-)/i )
     {
+
+      # TODO: This is fragile, if a sequence is searched against itself then you end up 
+      #       only one sequence because the IDs are the descriminating factor!
 
       # Query or Subject
       if ( $1 eq $qryID ) {

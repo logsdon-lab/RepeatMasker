@@ -10,8 +10,11 @@ RUN apt-get update && \
         gcc \ 
         build-essential \
         python3 \
+        python3-pip \
         make && \
     rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install h5py
 
 WORKDIR /usr/local/bin
 
@@ -26,21 +29,17 @@ RUN wget https://www.repeatmasker.org/rmblast/rmblast-2.14.1+-x64-linux.tar.gz &
 
 WORKDIR /usr/local/RepeatMasker
 
-# Get Libraries/ with basic Dfam.hmm
-RUN wget https://www.repeatmasker.org/RepeatMasker/RepeatMasker-4.1.0.tar.gz
-RUN mkdir Libraries && \
-    tar -xzf RepeatMasker-4.1.0.tar.gz \
-    RepeatMasker/Libraries \
-    --strip-components=1 \
-    -C Libraries && \
-    rm RepeatMasker-4.1.0.tar.gz
+RUN mkdir Libraries
+RUN wget -O Dfam_curatedonly.h5.gz https://www.dfam.org/releases/Dfam_3.7/families/Dfam_curatedonly.h5.gz && \
+    gunzip -c Dfam_curatedonly.h5.gz > Libraries/Dfam.h5 && \
+    rm Dfam_curatedonly.h5.gz
 
 # Copy new code.
 COPY . .
 
 # Configure.
 RUN perl ./configure \
-    -libdir=/usr/local/RepeatMasker/Libraries \ 
+    -libdir=/usr/local/RepeatMasker/Libraries \
     -trf_prgm=/usr/local/bin/trf \
     -default_search_engine=rmblast \
     -rmblast_dir=/usr/local/bin/rmblast-2.14.1/bin

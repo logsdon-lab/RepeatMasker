@@ -284,7 +284,7 @@ sub setPathToEngine {
   my $result = `$value 2>&1`;
 
   # BLASTN 3.0-SE [2009-05-25] [linux26-x64-I32LPF64 2009-05-25T22:58:29]
-  if ( $result =~ /^(BLAST[PN]) (\S+ \[.*\])/ ) {
+  if ( $result =~ /^(BLAST[PNX]) (\S+ \[.*\])/m ) {
     $this->{'version'}    = $2;
     $this->{'engineName'} = $1;
   }
@@ -383,7 +383,7 @@ sub getParameters {
 
   # Constant parameters
   if ( $this->{'engineName'} eq "BLASTP" ) {
-    $parameters .= " -warnings -T=1000000 -p=1 -hspmax=2000000000 -gi ";
+    $parameters .= " -warnings -T=1000000 -hspmax=2000000000 -gi ";
     $parameters .= " V=0 B=100000000";
   }
   elsif ( $this->{'engineName'} eq "BLASTN" ) {
@@ -454,6 +454,13 @@ sub getParameters {
        && $value =~ /\d+/ )
   {
     $parameters .= " gapW=" . ( ( $value * 3 ) + 1 );
+  }
+
+  if ( defined( $value = $this->getCores() ) ) {
+    $parameters .= " -cpus=$value ";
+  }
+  else {
+    $parameters .= " -cpus=4 ";
   }
 
   if ( defined( $value = $this->getMatrix() ) ) {
