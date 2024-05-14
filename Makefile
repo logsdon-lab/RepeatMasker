@@ -1,7 +1,7 @@
 .PHONY: docker
 
 DOCKER_IMAGE="logsdonlab/repeatmasker70"
-DOCKER_TAG="latest"
+DOCKER_TAG="v4.1.5"
 
 
 docker:
